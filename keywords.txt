@@ -1,0 +1,30 @@
+#######################################
+# Syntax Coloring Map For Button
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+Button	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+Text KEYWORD2
+Checked KEYWORD2
+init KEYWORD2
+setHoldTime KEYWORD2
+setLongHoldTime KEYWORD2
+setDoubleClickTime KEYWORD2
+eventPress KEYWORD2
+eventClick KEYWORD2
+eventDoubleClick KEYWORD2
+eventHold KEYWORD2
+eventLongHold KEYWORD2
+handleButton KEYWORD2
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+#	LITERAL1
