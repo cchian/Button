@@ -1,3 +1,5 @@
+#ifndef BUTTON
+#define BUTTON
 class Button {
   private:
     int buttonPin = 19; // analog input pin to use as a digital input
@@ -150,4 +152,4 @@ void Button::handleButton() {
   if (b == 4) funcEventLongHold(buttonPin);
 }
 
-
+#endif
