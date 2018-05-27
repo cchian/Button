@@ -1,13 +1,18 @@
 #ifndef BUTTON
 #define BUTTON
+
+#define TOUCH 0
+#define DIO 1 
 class Button {
   private:
+	int pinType=1; //default pin type is digitalIO get input by digitalRead function
     int buttonPin = 19; // analog input pin to use as a digital input
     // Button timing variables
     int debounce = 20; // ms debounce period to prevent flickering when pressing or releasing the button
     int DCgap = 100; // max ms between clicks for a double click event
     int holdTime = 2000; // ms hold period: how long to wait for press+hold event
     int longHoldTime = 5000; // ms long hold period: how long to wait for press+hold event
+	int threadHold=40;
 
     // Other button variables
     boolean buttonVal = HIGH; // value read from button
@@ -22,7 +27,8 @@ class Button {
     boolean holdEventPast = false; // whether or not the hold event happened already
     boolean longHoldEventPast = false;// whether or not the long hold event happened already
     boolean enablePress = false;
-    void (*funcEventPress)(int pinSource);
+    
+	void (*funcEventPress)(int pinSource);
     void (*funcEventClick)(int pinSource);
     void (*funcEventDoubleClick)(int pinSource);
     void (*funcEventHold)(int pinSource);
@@ -30,25 +36,38 @@ class Button {
     int checkButton();
 
   public:
-    Button(int pin);
+    Button(int pin,int pinType);
     String Text="";
     int Checked=0;
-    void init(int pin);
-    void setHoldTime(int millis = 2000);
-    void setLongHoldTime(int millis = 5000);
-    void setDoubleClickTime(int millis = 250);
+    void init(int pin,int pinType);
+	void setPressDebounce(int debounce);
+    void setHoldTime(int millis);
+    void setLongHoldTime(int millis);
+    void setDoubleClickTime(int millis);
+	void setTouchThreadHold(int th);
     void eventPress(void (*pressFunc));
     void eventClick(void (*clickFunc));
     void eventDoubleClick(void (*doublClickFunc));
     void eventHold(void (*holdFunc));
     void eventLongHold(void (*longlHoldFunc));
+	
     void handleButton();
 };
-
+void Button::setTouchThreadHold(int th=40){
+	this->threadHold=th;
+}
 int Button::checkButton() {
   int event = 0;
   // Read the state of the button
+  if(this->pinType!=TOUCH){
   buttonVal = digitalRead(buttonPin);
+  }else{
+	  if(touchRead(buttonPin)<=this->threadHold){
+		  buttonVal=LOW;
+	  }else{
+			  buttonVal=HIGH;
+	  }
+  }
   // Button pressed down
   if (buttonVal == LOW && buttonLast == HIGH && (millis() - upTime) > debounce) {
     //fixed for button press, click and double click
@@ -108,41 +127,47 @@ int Button::checkButton() {
   return event;
 }
 
-Button::Button(int pin) {
-  this->init(pin);
+Button::Button(int pin,int pinType=0) {
+  this->init(pin,pinType);
 };
 
-void Button::setHoldTime(int millis = 2000) {
+void Button::setPressDebounce(int debounce=20){
+	this->debounce=debounce;
+}
+
+void Button::setHoldTime(int millis=2000) {
   this->holdTime = millis;
 }
-void Button::setLongHoldTime(int millis = 5000) {
+void Button::setLongHoldTime(int millis=5000) {
   this->longHoldTime = millis;
 }
-void Button::setDoubleClickTime(int millis = 250) {
+void Button::setDoubleClickTime(int millis=100) {
   this->DCgap = millis;
 }
-void Button::eventPress(void (*pressFunc)) {
+
+void Button::eventPress(void *pressFunc) {
   this->enablePress = true;
-  this->funcEventPress = pressFunc;
+  this->funcEventPress = (void (*)(int))pressFunc;
 }
 void Button::eventClick(void (*clickFunc)) {
-  this->funcEventClick = clickFunc;
+  this->funcEventClick = (void (*)(int))clickFunc;
 }
 void Button::eventDoubleClick(void (*doublClickFunc)) {
-  this->funcEventDoubleClick = doublClickFunc;
+  this->funcEventDoubleClick = (void (*)(int))doublClickFunc;
 }
 void Button::eventHold(void (*holdFunc)) {
-  this->funcEventHold = holdFunc;
+  this->funcEventHold = (void (*)(int))holdFunc;
 }
 void Button::eventLongHold(void (*longlHoldFunc)) {
-  this->funcEventLongHold = longlHoldFunc;
+  this->funcEventLongHold = (void (*)(int))longlHoldFunc;
 }
 
-
-
-void Button::init(int pin) {
-  this->buttonPin = pin;
-  pinMode(buttonPin, INPUT_PULLUP);
+void Button::init(int pin,int pinType=0) {
+	this->pinType=pinType;
+	this->buttonPin = pin;
+if(this->pinType!=TOUCH){
+	pinMode(buttonPin, INPUT_PULLUP);
+}
 }
 void Button::handleButton() {
   int b = checkButton();
