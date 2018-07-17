@@ -1,7 +1,9 @@
 #ifndef BUTTON
 #define BUTTON
 
-#define TOUCH 0
+#ifdef ESP32
+	#define TOUCH 0
+#endif
 #define DIO 1 
 class Button {
   private:
@@ -61,13 +63,17 @@ int Button::checkButton() {
   // Read the state of the button
   if(this->pinType!=TOUCH){
   buttonVal = digitalRead(buttonPin);
-  }else{
+  }
+  #ifdef ESP32
+  else{
+	  
 	  if(touchRead(buttonPin)<=this->threadHold){
 		  buttonVal=LOW;
 	  }else{
 			  buttonVal=HIGH;
-	  }
+	  }  
   }
+  #endif
   // Button pressed down
   if (buttonVal == LOW && buttonLast == HIGH && (millis() - upTime) > debounce) {
     //fixed for button press, click and double click

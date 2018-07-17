@@ -1,10 +1,17 @@
-#include"Button.h"
+#include <Button.h>
 
+//declare button obj use pin 2, DIO as default pinType
 Button button(2);
+//same as below
+//Button button(2,DIO);
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
+#if defined(ESP32) || defined(ESP8266)
+  button.eventClick((void*)clicked);
+#else
   button.eventClick(clicked);
+#endif
   pinMode(3, OUTPUT);
 }
 void clicked() {
