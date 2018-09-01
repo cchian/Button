@@ -2,19 +2,19 @@
 #define BUTTON
 
 #ifdef ESP32
-	#define TOUCH 0
+#define TOUCH 0
 #endif
-#define DIO 1 
+#define DIO 1
 class Button {
   private:
-	int pinType=1; //default pin type is digitalIO get input by digitalRead function
+    int pinType = 1; //default pin type is digitalIO get input by digitalRead function
     int buttonPin = 19; // analog input pin to use as a digital input
     // Button timing variables
     int debounce = 20; // ms debounce period to prevent flickering when pressing or releasing the button
     int DCgap = 100; // max ms between clicks for a double click event
     int holdTime = 2000; // ms hold period: how long to wait for press+hold event
     int longHoldTime = 5000; // ms long hold period: how long to wait for press+hold event
-	int threadHold=40;
+    int threadHold = 40;
 
     // Other button variables
     boolean buttonVal = HIGH; // value read from button
@@ -29,8 +29,14 @@ class Button {
     boolean holdEventPast = false; // whether or not the hold event happened already
     boolean longHoldEventPast = false;// whether or not the long hold event happened already
     boolean enablePress = false;
-    
-	void (*funcEventPress)(int pinSource);
+    boolean enableRelease = false;
+    boolean enableClick = false;
+    boolean enableDoubleClick = false;
+    boolean enableHold = false;
+    boolean enableLongHold = false;
+
+    void (*funcEventPress)(int pinSource);
+    void (*funcEventRelease)(int pinSource);
     void (*funcEventClick)(int pinSource);
     void (*funcEventDoubleClick)(int pinSource);
     void (*funcEventHold)(int pinSource);
@@ -38,42 +44,43 @@ class Button {
     int checkButton();
 
   public:
-    Button(int pin,int pinType);
-    String Text="";
-    int Checked=0;
-    void init(int pin,int pinType);
-	void setPressDebounce(int debounce);
+    Button(int pin, int pinType);
+    String Text = "";
+    int Checked = 0;
+    void init(int pin, int pinType);
+    void setPressDebounce(int debounce);
     void setHoldTime(int millis);
     void setLongHoldTime(int millis);
     void setDoubleClickTime(int millis);
-	void setTouchThreadHold(int th);
+    void setTouchThreadHold(int th);
     void eventPress(void (*pressFunc));
+    void eventRelease(void (*releaseFunc));
     void eventClick(void (*clickFunc));
     void eventDoubleClick(void (*doublClickFunc));
     void eventHold(void (*holdFunc));
     void eventLongHold(void (*longlHoldFunc));
-	
+
     void handleButton();
 };
-void Button::setTouchThreadHold(int th=40){
-	this->threadHold=th;
+void Button::setTouchThreadHold(int th = 40) {
+  this->threadHold = th;
 }
 int Button::checkButton() {
   int event = 0;
   // Read the state of the button
-  if(this->pinType!=TOUCH){
-  buttonVal = digitalRead(buttonPin);
+  if (this->pinType != TOUCH) {
+    buttonVal = digitalRead(buttonPin);
   }
-  #ifdef ESP32
-  else{
-	  
-	  if(touchRead(buttonPin)<=this->threadHold){
-		  buttonVal=LOW;
-	  }else{
-			  buttonVal=HIGH;
-	  }  
+#ifdef ESP32
+  else {
+
+    if (touchRead(buttonPin) <= this->threadHold) {
+      buttonVal = LOW;
+    } else {
+      buttonVal = HIGH;
+    }
   }
-  #endif
+#endif
   // Button pressed down
   if (buttonVal == LOW && buttonLast == HIGH && (millis() - upTime) > debounce) {
     //fixed for button press, click and double click
@@ -102,6 +109,9 @@ int Button::checkButton() {
         DCwaiting = false;
         singleOK = false;
       }
+    }
+    if (enableRelease == true) {
+      funcEventRelease(buttonPin);
     }
   }
   // Test for normal click event: DCgap expired
@@ -133,21 +143,21 @@ int Button::checkButton() {
   return event;
 }
 
-Button::Button(int pin,int pinType=0) {
-  this->init(pin,pinType);
+Button::Button(int pin, int pinType = 0) {
+  this->init(pin, pinType);
 };
 
-void Button::setPressDebounce(int debounce=20){
-	this->debounce=debounce;
+void Button::setPressDebounce(int debounce = 20) {
+  this->debounce = debounce;
 }
 
-void Button::setHoldTime(int millis=2000) {
+void Button::setHoldTime(int millis = 2000) {
   this->holdTime = millis;
 }
-void Button::setLongHoldTime(int millis=5000) {
+void Button::setLongHoldTime(int millis = 5000) {
   this->longHoldTime = millis;
 }
-void Button::setDoubleClickTime(int millis=100) {
+void Button::setDoubleClickTime(int millis = 100) {
   this->DCgap = millis;
 }
 
@@ -155,32 +165,56 @@ void Button::eventPress(void *pressFunc) {
   this->enablePress = true;
   this->funcEventPress = (void (*)(int))pressFunc;
 }
+void Button::eventRelease(void *releaseFunc) {
+  this->enableRelease = true;
+  this->funcEventRelease = (void (*)(int))releaseFunc;
+}
 void Button::eventClick(void (*clickFunc)) {
+  this->enableClick = true;
   this->funcEventClick = (void (*)(int))clickFunc;
 }
 void Button::eventDoubleClick(void (*doublClickFunc)) {
+  this->enableDoubleClick = true;
   this->funcEventDoubleClick = (void (*)(int))doublClickFunc;
 }
 void Button::eventHold(void (*holdFunc)) {
+  this->enableHold = true;
   this->funcEventHold = (void (*)(int))holdFunc;
 }
 void Button::eventLongHold(void (*longlHoldFunc)) {
+  this->enableLongHold = true;
   this->funcEventLongHold = (void (*)(int))longlHoldFunc;
 }
 
-void Button::init(int pin,int pinType=0) {
-	this->pinType=pinType;
-	this->buttonPin = pin;
-if(this->pinType!=TOUCH){
-	pinMode(buttonPin, INPUT_PULLUP);
-}
+void Button::init(int pin, int pinType = 0) {
+  this->pinType = pinType;
+  this->buttonPin = pin;
+  if (this->pinType != TOUCH) {
+    pinMode(buttonPin, INPUT_PULLUP);
+  }
 }
 void Button::handleButton() {
   int b = checkButton();
-  if (b == 1) funcEventClick(buttonPin);
-  if (b == 2) funcEventDoubleClick(buttonPin);
-  if (b == 3) funcEventHold(buttonPin);
-  if (b == 4) funcEventLongHold(buttonPin);
+  if (b == 1) {
+    if (enableClick == true) {
+      funcEventClick(buttonPin);
+    }
+  }
+  if (b == 2) {
+    if (enableDoubleClick == true) {
+      funcEventDoubleClick(buttonPin);
+    }
+  }
+  if (b == 3) {
+    if (enableHold == true) {
+      funcEventHold(buttonPin);
+    }
+  }
+  if (b == 4) {
+    if (enableLongHold == true) {
+      funcEventLongHold(buttonPin);
+    }
+  }
 }
 
 #endif

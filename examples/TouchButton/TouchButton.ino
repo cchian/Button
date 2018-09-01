@@ -7,6 +7,9 @@ Button button(T2,TOUCH);
 void press(int sender) {
   Serial.println("Press pin "+String(sender));
 }
+void release(int sender) {
+  Serial.println("release pin "+String(sender));
+}
 void click(int sender) {
   Serial.println("Click pin "+String(sender));
 }
@@ -25,6 +28,7 @@ void setup() {
   Serial.begin(115200);
   //set callback function for Button
   button.eventPress((void*)press);
+  button.eventRelease((void*)release);
   button.eventClick((void*)click);
   button.eventDoubleClick((void*)doubleClick);
   button.eventHold((void*)hold);

@@ -20,6 +20,7 @@ setHoldTime KEYWORD2
 setLongHoldTime KEYWORD2
 setDoubleClickTime KEYWORD2
 eventPress KEYWORD2
+eventRelease KEYWORD2
 eventClick KEYWORD2
 eventDoubleClick KEYWORD2
 eventHold KEYWORD2

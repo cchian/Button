@@ -8,6 +8,9 @@ Button button(2);
 void press(int sender) {
   Serial.println("Press pin " + String(sender));
 }
+void release(int sender) {
+  Serial.println("Release pin " + String(sender));
+}
 void click(int sender) {
   Serial.println("Click pin " + String(sender));
 }
@@ -27,12 +30,14 @@ void setup() {
   //set callback function for Button
 #if defined(ESP32) || defined(ESP8266)
   button.eventPress((void*)press);
+  button.eventRelease((void*)release);
   button.eventClick((void*)click);
   button.eventDoubleClick((void*)doubleClick);
   button.eventHold((void*)hold);
   button.eventLongHold((void*)longHold);
 #else
   button.eventPress(press);
+  button.eventRelease(release);
   button.eventClick(click);
   button.eventDoubleClick(doubleClick);
   button.eventHold(hold);
