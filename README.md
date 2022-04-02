@@ -9,6 +9,8 @@ Support the following Event-Driven
  -DoubleClick
  -Hold (long press)
  -LongHold (more than LongPress)<hr>
+ picture from
+ https://commandronestore.com/learning/learning_img/preview_img/arduino0000/arduino002_1.png
 
 <font color="#434f54">&#47;&#47; &nbsp;Change Arduino editor font to &#34;Courier New&#34; for specify correct ESP32 image below.</font>
 <font color="#434f54">&#47;&#47; &nbsp;1.Click the link at the line following File &gt; Preferences &gt; More preferences can be edited directly in the file.</font>
