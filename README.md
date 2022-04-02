@@ -10,10 +10,6 @@ Support the following Event-Driven
  -Hold (long press)
  -LongHold (more than LongPress)<hr>
 
-
-<font color="#434f54">&#47;&#47; &nbsp;WiiLighting-OS v4.0 Lignting Control firmware for ESP32 Copy Left by Wichian Toso</font>
-<font color="#434f54">&#47;&#47; &nbsp;(this sketch was available on </font><u><font color="#434f54">https:&#47;&#47;github.com&#47;cchian&#47;wiilighting-os</font></u><font color="#434f54">)</font>
-
 <font color="#434f54">&#47;&#47; &nbsp;Change Arduino editor font to &#34;Courier New&#34; for specify correct ESP32 image below.</font>
 <font color="#434f54">&#47;&#47; &nbsp;1.Click the link at the line following File &gt; Preferences &gt; More preferences can be edited directly in the file.</font>
 <font color="#434f54">&#47;&#47; &nbsp;&nbsp;&nbsp;This will open the .Arduino15 (or something like that) folder.</font>
