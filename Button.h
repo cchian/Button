@@ -1,12 +1,14 @@
 #ifndef BUTTON
 #define BUTTON
 
-#ifdef ESP32
 #define TOUCH 0
-#endif
 #define DIO 1
+
 class Button {
   private:
+	/*
+	*  main variable (can change value for your default)
+	*/
     int pinType = 1; //default pin type is digitalIO get input by digitalRead function
     int buttonPin = 19; // analog input pin to use as a digital input
     // Button timing variables
@@ -14,9 +16,14 @@ class Button {
     int DCgap = 100; // max ms between clicks for a double click event
     int holdTime = 2000; // ms hold period: how long to wait for press+hold event
     int longHoldTime = 5000; // ms long hold period: how long to wait for press+hold event
-    int threadHold = 40;
-
-    // Other button variables
+    int threadHold = 40; //threadhold for touch pin (for esp32 only)
+	/*active LOW by default (need external_pullup for some pins)
+	* can change it to HIGH (recomended for some pins not working with INPUT_PULLUP)
+	*/
+	int activeState = LOW; 
+    /*
+	*  Other button variables (don't change any.)
+	*/
     boolean buttonVal = HIGH; // value read from button
     boolean buttonLast = HIGH; // buffered value of the button's previous state
     boolean DCwaiting = false; // whether we're waiting for a double click (down)
@@ -35,6 +42,9 @@ class Button {
     boolean enableHold = false;
     boolean enableLongHold = false;
 
+	/*
+	*   event source function
+	*/
     void (*funcEventPress)(int pinSource);
     void (*funcEventRelease)(int pinSource);
     void (*funcEventClick)(int pinSource);
@@ -42,12 +52,16 @@ class Button {
     void (*funcEventHold)(int pinSource);
     void (*funcEventLongHold)(int pinSource);
     int checkButton();
+	
+
 
   public:
-    Button(int pin, int pinType);
+    Button(int pin, int pinType,int ast);
     String Text = "";
     int Checked = 0;
-    void init(int pin, int pinType);
+    void init(int pin, int pinType,int ast);
+	boolean isPress();
+	void setActiveState(int state);
     void setPressDebounce(int debounce);
     void setHoldTime(int millis);
     void setLongHoldTime(int millis);
@@ -59,29 +73,40 @@ class Button {
     void eventDoubleClick(void (*doublClickFunc));
     void eventHold(void (*holdFunc));
     void eventLongHold(void (*longlHoldFunc));
-
-    void handleButton();
+	void handleButton();
+    
 };
+
+boolean Button::isPress(){
+	if(buttonVal == LOW)
+		return true;
+	return false;
+}
 void Button::setTouchThreadHold(int th = 40) {
   this->threadHold = th;
 }
+
 int Button::checkButton() {
   int event = 0;
   // Read the state of the button
+
   if (this->pinType != TOUCH) {
     buttonVal = digitalRead(buttonPin);
   }
-#ifdef ESP32
+ #ifdef ESP32 
   else {
-
+//Serial.println(touchRead(buttonPin));
     if (touchRead(buttonPin) <= this->threadHold) {
       buttonVal = LOW;
     } else {
       buttonVal = HIGH;
     }
+	
   }
 #endif
   // Button pressed down
+  if(activeState==HIGH)
+	  buttonVal=!buttonVal;
   if (buttonVal == LOW && buttonLast == HIGH && (millis() - upTime) > debounce) {
     //fixed for button press, click and double click
     if (enablePress == true) {
@@ -143,9 +168,13 @@ int Button::checkButton() {
   return event;
 }
 
-Button::Button(int pin, int pinType = 0) {
-  this->init(pin, pinType);
+Button::Button(int pin, int pinType = 1,int ast=LOW) {
+  this->init(pin, pinType, ast);
 };
+
+void Button::setActiveState(int state=LOW){
+	activeState=state;
+}
 
 void Button::setPressDebounce(int debounce = 20) {
   this->debounce = debounce;
@@ -186,11 +215,19 @@ void Button::eventLongHold(void (*longlHoldFunc)) {
   this->funcEventLongHold = (void (*)(int))longlHoldFunc;
 }
 
-void Button::init(int pin, int pinType = 0) {
+void Button::init(int pin, int pinType = 0,int ast=LOW) {
+  this->activeState=ast;
   this->pinType = pinType;
   this->buttonPin = pin;
   if (this->pinType != TOUCH) {
-    pinMode(buttonPin, INPUT_PULLUP);
+	//the following work with INPUT_PULLUP: 14, 16, 17, 18, 19, 21, 22, 23 
+	//this library will check button state with LOW
+	if(activeState==LOW){
+		pinMode(buttonPin, INPUT_PULLUP);
+	}else{
+		pinMode(buttonPin, INPUT);
+	}
+	//Serial.println("pullup");
   }
 }
 void Button::handleButton() {
