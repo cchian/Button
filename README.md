@@ -3,7 +3,7 @@
 This Library allow you to Use the GPIO of Arduino,ESP32,ESP8266 pin as a Button Switch.<br>
 Its easy to use.<br>
 
-<pre>
+
 <font color="#434f54">&#47;&#47; &nbsp;WiiLighting-OS v4.0 Lignting Control firmware for ESP32 Copy Left by Wichian Toso</font>
 <font color="#434f54">&#47;&#47; &nbsp;(this sketch was available on </font><u><font color="#434f54">https:&#47;&#47;github.com&#47;cchian&#47;wiilighting-os</font></u><font color="#434f54">)</font>
 
@@ -119,4 +119,3 @@ Its easy to use.<br>
 <font color="#000000">}</font>
 
 
-</pre>
