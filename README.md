@@ -3,11 +3,11 @@
 This Library allow you to Use the GPIO of Arduino,ESP32,ESP8266 pin as a Button Switch.<br>
 <pre>
 Its easy to use.<br>
-support for the following event-driven
- -Press<br>
- -Click</br>
- -DoubleClick</br>
- -Hold (long press)</br>
+Support for the following Event-Driven
+ -Press
+ -Click
+ -DoubleClick
+ -Hold (long press)
  -LongHold (more than LongPress)<hr>
 
 
