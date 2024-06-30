@@ -1,6 +1,7 @@
 # Button
 ไลบารีใช้ในการจัดการขา IO ของ Arduino ให้เป็น Switch Input<br>
-This library allows you to use GPIO pins of Arduino, ESP32, and ESP8266 (including touch pins for ESP32) as buttons or switches. It is easy to use.
+This library allows you to use GPIO pins of Arduino, ESP32, 
+and ESP8266 (including touch pins for ESP32) as buttons or switches. It is easy to use.
 <pre>
 <br>
 Support the following Event-Driven
