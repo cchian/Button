@@ -6,6 +6,7 @@ and ESP8266 (including touch pins for ESP32) as buttons or switches. It is easy 
 <br>
 Support the following Event-Driven
  -Press
+ -Release
  -Click
  -DoubleClick
  -Hold (long press)
